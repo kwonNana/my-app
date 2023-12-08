@@ -1,8 +1,52 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { login, logOut, onUserState } from '../api/firebase';
+import UserDatas from './UserDatas';
+import { useAuthContext } from '../context/AuthContext';
+import CategoryList from './CategoryList';
 
 function Nav() {
+    //const {user, login, logOut} = useAuthContext();
+    const [user, setUser] = useState();
+    const navigate = useNavigate();
+
+    const userLogOut=()=>{
+        logOut().then(setUser);
+    }    
+
+    useEffect(()=>{
+        onUserState((user)=>{
+            console.log(user)
+            // setUser(user);
+        });
+    },[])
+
+
+    /*
+    로그인 버튼 온클릭 이벤트
+    const userLogin=()=>{   
+        navigate('/login')
+    }
+
+    <button onClick={userLogin}>login</button>
+    */
+
+    
+
+    // useEffect(()=>{
+    //     onUserState(setUser);
+    // })
+
+    // const userLogin = ()=>{
+    //     login().then(setUser);
+    // }
+
+    // const userLogOut =()=>{
+    //     logOut().then(setUser)
+    // }
+
+    
     return (
             <HeaderContainer>
                 <Link to='/'>
@@ -10,17 +54,43 @@ function Nav() {
                 </Link>
 
                 <nav>
-                    <Link to='/products/new'>
+                    {/* <Link to='/products/new'>
                         신상품
-                    </Link>
+                    </Link> */}
+                    <CategoryList/>
                     <Link to='/products'>
                         모든 상품
-                    </Link>
+                    </Link>        
+
                 </nav>
 
                 <div className="userWrap">
-                    <button className='loginBtn'>Login</button>
-                    <button className='logoutBtn'>Logout</button>
+                    <Link to = '/search'>검색</Link>
+                    <Link to ='/cart'>장바구니</Link>
+
+                    {user && user.isAdmin &&(
+                        <Link to='/products/new'>
+                        상품등록
+                        </Link> 
+                    )}
+                    {/* {user && <UserDatas user={user}/>}
+                    {!user && <button onClick={login} className='loginBtn'>Login</button>}
+                    {user && <button onClick={logOut} className='logoutBtn'>Logout</button>} */}
+                    {/* <Link to='/login'>
+                        로그인
+                    </Link> */}
+                    {user ? (
+                        <>
+                            {user && <UserDatas user={user}/>}
+                            <button onClick={userLogOut} className='logoutBtn'>logout</button>
+                            {/* <button onClick={logOut} className='logoutBtn'>logout</button> */}
+                        </>
+                    ) :(
+                        <Link to='/login'>
+                            <button className='loginBtn'>login</button>
+                        </Link>
+                        //<button onClick={userLogin}>login</button>
+                    )}
                 </div>
             </HeaderContainer>
     );
